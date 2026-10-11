@@ -6,13 +6,16 @@ import com.ecommerce.product_service.mapper.ProductMapper;
 import com.ecommerce.product_service.model.Product;
 import com.ecommerce.product_service.repository.ProductRepository;
 import com.ecommerce.product_service.service.ProductService;
+import com.ecommerce.product_service.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProductSerciveImpl implements ProductService {
 
     private final ProductRepository repository;
@@ -24,14 +27,14 @@ public class ProductSerciveImpl implements ProductService {
 
         Product product = mapper.toProduct(productRequestDTO);
 
-        repository.save(product);
+        Product savedProduct = repository.save(product);
+        log.info("Product created successfully with ID: {}", savedProduct.getId());
 
-        return mapper.toProductResponseDTO(product);
+        return mapper.toProductResponseDTO(savedProduct);
     }
 
     @Override
     public List<ProductResponseDTO> getAllProducts() {
-
         return repository.findAll()
                 .stream()
                 .map(mapper::toProductResponseDTO)
@@ -39,23 +42,33 @@ public class ProductSerciveImpl implements ProductService {
     }
 
     @Override
-    public ProductResponseDTO getProductById(Long id) {
-        return repository.findById(String.valueOf(id))
-                .map(mapper::toProductResponseDTO)
-                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+    public ProductResponseDTO getProductById(String id) {
+        Product product = repository.findById(String.valueOf(id))
+                .orElseThrow(() -> new ResourceNotFoundException("Product", "id", id));;
+
+        return mapper.toProductResponseDTO(product);
     }
 
     @Override
-    public ProductResponseDTO updateProduct(Long id, ProductRequestDTO productRequestDTO) {
+    public ProductResponseDTO updateProduct(String id, ProductRequestDTO productRequestDTO) {
 
         Product product = repository.findById(String.valueOf(id))
-                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Product", "id", id));
 
-        return repository.;
+        mapper.updateProductFromRequest(productRequestDTO, product);
+
+        Product updatedProduct = repository.save(product);
+        log.info("Product updated successfully with ID: {}", updatedProduct.getId());
+
+        return mapper.toProductResponseDTO(updatedProduct);
     }
 
     @Override
-    public ProductResponseDTO deleteProduct(Long id) {
-        return null;
+    public void deleteProduct(String id) {
+        if (!repository.existsById(id)) {
+            throw new ResourceNotFoundException("Product", "id", id);
+        }
+        repository.deleteById(id);
+        log.info("Product deleted successfully with ID: {}", id);
     }
 }

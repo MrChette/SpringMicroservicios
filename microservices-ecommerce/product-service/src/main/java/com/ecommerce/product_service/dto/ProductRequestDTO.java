@@ -6,7 +6,8 @@ import jakarta.validation.constraints.Positive;
 
 import java.math.BigDecimal;
 
-public record ProductRequestDTO(@NotBlank(message = "Name is required") String name,
+public record ProductRequestDTO(@NotBlank(message = "Name is required")
+                                String name,
                                 String description,
                                 @NotNull(message = "Price is required")
                                 @Positive(message = "Price must be a positive value")
