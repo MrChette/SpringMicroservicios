@@ -18,11 +18,11 @@ services:
     ports:
       - "8080:8080"
     environment:
-      # Sobreescribimos la config de Spring para usar Docker
+      # Sobrescribimos la config de Spring para usar Docker
       # usamos 'mongodb' en Lugar de 'localhost'
       - SPRING_DATA_MONGODB_URI=mongodb://root:password@mongodb:27017/product-db?authSource=admin
     depends_on:
-      - mongodb           # Esper a que la BD arranque primero
+      - mongodb           # Espera a que la BD arranque primero
 
 volumes:
   mongo_data:             # Declarators el volumen persistente
