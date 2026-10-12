@@ -16,7 +16,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ProductSerciveImpl implements ProductService {
+public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository repository;
 

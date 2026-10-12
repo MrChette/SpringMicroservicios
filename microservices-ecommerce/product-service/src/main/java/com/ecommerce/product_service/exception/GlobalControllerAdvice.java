@@ -15,7 +15,7 @@ import java.util.Map;
 
 @RestControllerAdvice
 @Slf4j
-public class GlogalControllerAdvice {
+public class GlobalControllerAdvice {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ProblemDetail handlerResourceNotFoundException(ResourceNotFoundException ex, WebRequest request) {
