@@ -7,10 +7,12 @@ import com.ecommerce.order_service.mapper.OrderMapper;
 import com.ecommerce.order_service.model.Order;
 import com.ecommerce.order_service.repository.OrderRepository;
 import com.ecommerce.order_service.service.OrderService;
+import com.ecommerce.order_service.service.client.InventoryClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
@@ -23,7 +25,8 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
-    private final WebClient.Builder webClientBuilder;
+//    private final WebClient.Builder webClientBuilder;
+    private final InventoryClient inventoryClient;
 
     @Override
     @Transactional
@@ -37,12 +40,19 @@ public class OrderServiceImpl implements OrderService {
             Integer quantity = item.getQuantity();
 
             try{
-                Boolean inStock = webClientBuilder.build().put()
-                        .uri("http://localhost:8080/api/v1/inventory/reduce-stock/" + sku,
-                                uriBuilder -> uriBuilder.queryParam("quantity", quantity).build())
-                        .retrieve()
-                        .bodyToMono(Boolean.class)
-                        .block();
+//                Boolean stockReduced = webClientBuilder.build().put()
+//                        .uri("http://localhost:8080/api/v1/inventory/reduce-stock/" + sku,
+//                                uriBuilder -> uriBuilder.queryParam("quantity", quantity).build())
+//                        .accept(MediaType.APPLICATION_JSON)
+//                        .retrieve()
+//                        .bodyToMono(Boolean.class)
+//                        .block();
+//                if (!Boolean.TRUE.equals(stockReduced)) {
+//                    throw new IllegalArgumentException("No se pudo reducir el stock para SKU " + sku);
+//                }
+
+                inventoryClient.reduceStock(sku, quantity);
+
             }catch (Exception e){
                 log.error("Error al reducir stock para SKU {}: {}", sku, e.getMessage());
                 throw new IllegalArgumentException("No se pudo reducir el stock para SKU, Stock insuficiente o error de inventario en " + sku);

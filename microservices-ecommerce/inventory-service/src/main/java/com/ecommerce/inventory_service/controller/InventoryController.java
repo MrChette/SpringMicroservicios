@@ -6,6 +6,7 @@ import com.ecommerce.inventory_service.service.InventoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -46,10 +47,10 @@ public class InventoryController {
         inventoryService.deleteInventoryById(id);
     }
 
-    @PutMapping("/reduce-stock/{sku}")
-    public String reduceStock(@PathVariable String sku,@RequestParam("quantity") Integer quantity) {
+    @PutMapping(value = "/reduce-stock/{sku}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public boolean reduceStock(@PathVariable String sku,@RequestParam("quantity") Integer quantity) {
         inventoryService.reduceStock(sku, quantity);
-        return "Stock reduced successfully for SKU: " + sku;
+        return true;
     }
 
 
