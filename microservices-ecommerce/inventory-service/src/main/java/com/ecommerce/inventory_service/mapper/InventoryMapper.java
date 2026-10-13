@@ -13,10 +13,8 @@ public interface InventoryMapper {
     @Mapping(target = "id", ignore = true)
     Inventory toInventory(InventoryRequestDTO inventoryDTO);
 
-    InventoryResponseDTO toInventoryResponseDTO(Inventory inventory);
-
     @Mapping(target = "inStock", expression = "java(inventory.getQuantity() > 0)")
-    InventoryResponseDTO toResponse(Inventory inventory);
+    InventoryResponseDTO toInventoryResponseDTO(Inventory inventory);
 
     @Mapping(target = "id", ignore = true)
     void updateInventoryFromRequest(InventoryRequestDTO inventoryDTO, @MappingTarget Inventory inventory);
