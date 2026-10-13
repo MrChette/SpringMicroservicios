@@ -46,6 +46,12 @@ public class InventoryController {
         inventoryService.deleteInventoryById(id);
     }
 
+    @PutMapping("/reduce-stock/{sku}")
+    public String reduceStock(@PathVariable String sku,@RequestParam("quantity") Integer quantity) {
+        inventoryService.reduceStock(sku, quantity);
+        return "Stock reduced successfully for SKU: " + sku;
+    }
+
 
     @GetMapping("/test-fail")
     public void testFail() {

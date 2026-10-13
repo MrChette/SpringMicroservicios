@@ -36,15 +36,16 @@ public class OrderServiceImpl implements OrderService {
             String sku = item.getSku();
             Integer quantity = item.getQuantity();
 
-            Boolean inStock = webClientBuilder.build().get()
-                    .uri("http://localhost:8080/api/v1/inventory/" + sku,
-                            uriBuilder -> uriBuilder.queryParam("quantity", quantity).build())
-                    .retrieve()
-                    .bodyToMono(Boolean.class)
-                    .block();
-
-            if(!Boolean.TRUE.equals(inStock)){
-                throw new IllegalArgumentException("El artículo con SKU " + sku + " no está disponible en la cantidad solicitada.");
+            try{
+                Boolean inStock = webClientBuilder.build().put()
+                        .uri("http://localhost:8080/api/v1/inventory/reduce-stock/" + sku,
+                                uriBuilder -> uriBuilder.queryParam("quantity", quantity).build())
+                        .retrieve()
+                        .bodyToMono(Boolean.class)
+                        .block();
+            }catch (Exception e){
+                log.error("Error al reducir stock para SKU {}: {}", sku, e.getMessage());
+                throw new IllegalArgumentException("No se pudo reducir el stock para SKU, Stock insuficiente o error de inventario en " + sku);
             }
 
         }

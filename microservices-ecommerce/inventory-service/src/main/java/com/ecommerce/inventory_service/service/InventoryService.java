@@ -13,5 +13,6 @@ public interface InventoryService {
     InventoryResponseDTO getInventoryById(Long productId);
     InventoryResponseDTO updateInventory(Long id,InventoryRequestDTO inventoryRequestDTO);
     void deleteInventoryById(Long productId);
+    void reduceStock(String sku, Integer quantity);
 
 }
