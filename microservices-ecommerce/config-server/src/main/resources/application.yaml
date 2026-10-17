@@ -1,3 +1,13 @@
 spring:
   application:
     name: config-server
+  cloud:
+    config:
+      server:
+        git:
+          uri: file:///C:/Users/Chete/Documents/DevTalles/SpringBoot4-Arquitectura_Microservicios/microservices-ecommerce
+          search-paths: config-data
+          clone-on-start: true
+          default-label: master
+server:
+  port: 8888
