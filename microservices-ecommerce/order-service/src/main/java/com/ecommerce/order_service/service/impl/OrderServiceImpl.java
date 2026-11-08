@@ -10,6 +10,8 @@ import com.ecommerce.order_service.service.OrderService;
 import com.ecommerce.order_service.service.client.InventoryClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.http.MediaType;
@@ -21,6 +23,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@RefreshScope
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
@@ -28,9 +31,18 @@ public class OrderServiceImpl implements OrderService {
 //    private final WebClient.Builder webClientBuilder;
     private final InventoryClient inventoryClient;
 
+    @Value("${order.enabled:true}")
+    private boolean ordersEnabled;
+
     @Override
     @Transactional
     public OrderResponse placeOrder(OrderRequest orderRequest) {
+
+        if(!ordersEnabled){
+            log.warn("Intento de crear orden mientras el servicio está deshabilitado.");
+            throw new RuntimeException("El servicio de órdenes está actualmente deshabilitado.");
+        }
+
         log.info("Colocando nueva orden...");
 
         Order order = orderMapper.toOrder(orderRequest);
@@ -51,7 +63,9 @@ public class OrderServiceImpl implements OrderService {
 //                    throw new IllegalArgumentException("No se pudo reducir el stock para SKU " + sku);
 //                }
 
-                inventoryClient.reduceStock(sku, quantity);
+                if (!inventoryClient.reduceStock(sku, quantity)) {
+                    throw new IllegalStateException("Inventory did not confirm stock reduction for SKU " + sku);
+                }
 
             }catch (Exception e){
                 log.error("Error al reducir stock para SKU {}: {}", sku, e.getMessage());
